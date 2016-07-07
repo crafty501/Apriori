@@ -12,11 +12,15 @@ import java.util.List;
 
 public class Reader {
 
-	List<String[]> data;
+	protected List<String[]> data;
 	
-	List<String[]> itemSet;
+	protected List<String[]> itemSet;
 	
-	private void readFile(){
+	Collection elementsA = new HashSet<String>();
+	Collection elementsB = new HashSet<String>();
+	List<String> erg_x = new ArrayList<String>();
+	
+	protected void readFile(){
 		String line;
 		try {
 		    InputStream fis = new FileInputStream("data/test");
@@ -35,14 +39,13 @@ public class Reader {
 	
 	private boolean contains(String[] A, String[] B){
 		
-		Collection elemetsA = new HashSet<String>();
-		Collection elemetsB = new HashSet<String>();
-		
+		elementsA.clear();
+		elementsB.clear();
 		for (int i = 0; i < A.length; i++) {
-			elemetsA.add(A[i]);
-			elemetsB.add(B[i]);
+			elementsA.add(A[i]);
+			elementsB.add(B[i]);
 		}	
-		return elemetsA.equals(elemetsB);
+		return elementsA.equals(elementsB);
 		
 
 	}
@@ -56,7 +59,6 @@ public class Reader {
 	 */
 	
 	private boolean contains2(String[] A, String[] B){
-		
 		int c = 0;
 		for (int i = 0; i < A.length; i++) {
 			for (int j = 0; j < B.length; j++) {
@@ -94,7 +96,7 @@ public class Reader {
 	 * Itemsets der länge 1 zurückgegeben. 
 	 * @return
 	 */
-	private List<String[]> giveItemSet(){
+	protected List<String[]> giveItemSet(){
 		List<String[]> list = new ArrayList<String[]>();
 		List<String> x = new ArrayList<String>();
 		for (String[] strings : data) {
@@ -118,16 +120,16 @@ public class Reader {
 	 */
 	private List<String> getElementlist(List<String[]> liste){
 		
-		List<String> erg = new ArrayList<String>();
+		erg_x.clear();
 		for (String[] strings : liste) {
 			for (int i = 0; i < strings.length; i++) {
 				String S = strings[i];
-				if(!erg.contains(S)){
-					erg.add(S);
+				if(!erg_x.contains(S)){
+					erg_x.add(S);
 				}
 			}
 		}
-		return erg;
+		return erg_x;
 		
 	}
 	/**
@@ -142,18 +144,13 @@ public class Reader {
 	 * 
 	 */
 	private List<String[]> generateLargerItemSet(List<String[]> liste){
-		
-		
-		
 			List<String> one = this.getElementlist(liste);
 			List<String[]> erg = new ArrayList<String[]>();
 			int c = 0;
 			for (int i = 0; i < liste.size(); i++) {
 				String[] obj 	= liste.get(i);
-				
-				
+								
 				for (String lastElement : one) {
-				
 					//Erstelle ein neues Array und die letzte stelle 
 					//wird jedes Element angehangen
 					String[] neu = new String[obj.length + 1];
@@ -161,24 +158,25 @@ public class Reader {
 						neu[j] = obj[j];
 					}
 				
-					//Nur wenn element aus one nicht schon im Array vorliegt
+					//Nur wenn Element aus one nicht schon im Array vorliegt
 					boolean anhaengen = true;
 					for (int j = 0; j < neu.length -1; j++) {
 						if(neu[j].equals(lastElement)){
 							anhaengen = false;
 						}
 					}
-					neu[neu.length-1] = lastElement;
-					//Doppelte Einträge entfernen wie zum Beispiel (A,B) und (B,A)
-					for (String[] element : erg) {
-						
-						if(this.contains(neu, element)){
-							anhaengen = false;
-						}
-					}
-					
+					//Doppelte Einträge wie zum Beispiel (A,B) und (B,A) nicht anhängen
 					if(anhaengen){
-						
+						neu[neu.length-1] = lastElement;
+						for (String[] element : erg) {
+							if(this.contains(neu, element)){
+								anhaengen = false;
+							}
+						}
+						}
+					
+					
+					if(anhaengen){	
 						erg.add(neu);
 					}
 					c++;
@@ -200,10 +198,7 @@ public class Reader {
 		itemSet = new ArrayList<String[]>();
 		this.readFile();
 		
-		
-		itemSet = this.giveItemSet();
-
-		
+		itemSet = this.giveItemSet();		
 	}
 	
 	
@@ -227,19 +222,41 @@ public class Reader {
 	}
 	
 	
-	public void Apriori(){
-		
-		this.printItemSet();
-		System.out.println("--------------------------");
-		itemSet = this.generateLargerItemSet(itemSet);
 	
-		this.printItemSet();
-		System.out.println("--------------------------");
-		itemSet = this.generateLargerItemSet(itemSet);
+	public void Apriori(int k, float cutValue){
 		
-		this.printItemSet();
-		System.out.println("--------------------------");
 		
+		int i = 0;
+		while((i < k) && (itemSet.size()>= 1)){
+			
+			this.printItemSet();
+			System.out.println("-------------------------");
+			
+			
+			itemSet = this.generateLargerItemSet(itemSet);
+			
+			
+			//Lösche die Zeilen, die unter dem cutValue liegen
+			int index = 0;
+			while(index < itemSet.size()) {
+				String[] zeile = itemSet.get(index);
+				int occurs = this.occurs(zeile);
+				float p = (float)occurs / (float)data.size();
+				if(p < cutValue){
+					itemSet.remove(index);
+					//System.out.println("remove"+index+ " "+p);
+				}else{
+				index++;
+				}
+				
+			}
+			
+			
+			i++;
+		}
+		
+		
+			
 		
 	}
 	
