@@ -255,7 +255,7 @@ public class ReaderDB {
 		System.out.println("Erstelle erste join Tabelle");
 		this.createFirstJoinTable();
 		int i = 1;
-		while((i < maxk+1)){
+		while((i < maxk+1) && ((itemSetList.size()==0)||(i == 1))){
 			System.out.println("Compute Combinations ...");
 			itemSetList = this.generateLargerItemSet(i);
 			//Lösche die Zeilen, die unter dem cutValue liegen

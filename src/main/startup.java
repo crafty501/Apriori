@@ -20,8 +20,8 @@ public class startup {
 		
 		
 		ReaderDB r2 = new ReaderDB(mgr);
-		System.out.println("DB-Apriori mit cutValue=0.025f");
-		r2.Apriori(3, 0.025f);
+		System.out.println("DB-Apriori mit cutValue=0.015f");
+		r2.Apriori(3, 0.015f);
 		
 		
 	}
