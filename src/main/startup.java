@@ -18,13 +18,11 @@ public class startup {
 		Reader r1 = new Reader();
 		r1.Apriori(10, 0.25f);
 		
-		//TODO
-		/*
-		//ReaderDB r2 = new ReaderDB(mgr);
-		Collection<ItemSet> x  = r2.generateLargerItemSet();	
-		String S = x.toString();
-		System.out.println(S);
-		*/
+		
+		ReaderDB r2 = new ReaderDB(mgr);
+		System.out.println("DB-Apriori mit cutValue=0.025f");
+		r2.Apriori(3, 0.025f);
+		
 		
 	}
 	

@@ -27,7 +27,7 @@ public class ItemSet {
 		Iterator<String> I = items.iterator();
 		while(I.hasNext()){
 			String S = I.next();
-			System.out.println(S);
+			//System.out.println(S);
 			erg[i] = S;
 			i++;
 		}

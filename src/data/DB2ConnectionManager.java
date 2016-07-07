@@ -92,11 +92,9 @@ public class DB2ConnectionManager {
 		try {
 			Statement stm = this.con.createStatement();
 			if (result) {
-				if (stm.execute(query)) {
+				
 					return stm.executeQuery(query);
-				} else {
-					return null;
-				}
+				 
 			} else {
 				stm.execute(query);
 				return null;
