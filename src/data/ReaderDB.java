@@ -25,10 +25,23 @@ import java.util.List;
 public class ReaderDB {
 
 	
-	protected DB2ConnectionManager mgr;
+	protected final DB2ConnectionManager mgr;
 	protected List<String[]> data;
 	protected List<ItemSet> itemSetList;
 	int itemSetCount;
+	
+	
+	public ReaderDB(){
+		mgr = new DB2ConnectionManager();
+		itemSetCount = 3;
+		readFile();
+		//Neue Tabelle zum Joinen anlegen
+				//createNewJoinTable();
+				//itemSetCount++;
+				//createNewJoinTable();
+				//itemSetCount++;
+				//createNewJoinTable();
+	}
 	
 	protected void readFile(){
 		data = new ArrayList<String[]>();
@@ -99,7 +112,7 @@ public class ReaderDB {
 	}
 	
 	
-	private void createNewTable(int c ,List<ItemSet> itemSetList){
+	protected void createNewTable(int c ,List<ItemSet> itemSetList){
 		try {
 			List<String[]> l = this.giveItemsOnce(itemSetList);
 			String Anfrage = "CREATE TABLE VSISP72.ITEMSET"+c+" ( "
@@ -122,7 +135,7 @@ public class ReaderDB {
 		}
 	}
 	
-	private void createFirstJoinTable(){
+	protected void createFirstJoinTable(){
 		try {
 			//TODO: Hier die itemSetList übergeben
 			List<String[]> l = this.giveItemsOnce();
@@ -146,7 +159,7 @@ public class ReaderDB {
 		}
 	}
 	
-	private String makeJoinQuery(int c){
+	protected String makeJoinQuery(int c){
 		String table_names = "ItemSet0" ;
 		String field_names = "ItemSet0.ITEM AS \"0\"";
 		String where_cond  = "NOT ItemSet0.ITEM=ItemSet1.ITEM";
@@ -169,18 +182,7 @@ public class ReaderDB {
 		return Anfrage;
 	}
 	
-	public ReaderDB(DB2ConnectionManager _mgr){
-		super();
-		mgr = _mgr;
-		itemSetCount = 3;
-		readFile();
-		//Neue Tabelle zum Joinen anlegen
-				//createNewJoinTable();
-				//itemSetCount++;
-				//createNewJoinTable();
-				//itemSetCount++;
-				//createNewJoinTable();
-	}
+	
 	
 	
 	public List<ItemSet> generateLargerItemSet(int c){
@@ -219,7 +221,7 @@ public class ReaderDB {
 		return erg;
 		
 	}
-	private boolean contains2(String[] A, String[] B){
+	protected boolean contains2(String[] A, String[] B){
 		int c = 0;
 		for (int i = 0; i < A.length; i++) {
 			for (int j = 0; j < B.length; j++) {
@@ -235,7 +237,7 @@ public class ReaderDB {
 		}
 		
 	}
-	private int occurs(String[] line){
+	protected int occurs(String[] line){
 		
 		int c = 0;
 		for (String[] strings : data) {
@@ -247,49 +249,8 @@ public class ReaderDB {
 		return c;
 		
 	}
-	public void Apriori(int maxk, float cutValue){
-		
-		
-		
-		//Erstelle erste Join Tabelle
-		System.out.println("Erstelle erste join Tabelle");
-		this.createFirstJoinTable();
-		int i = 1;
-		itemSetList = new ArrayList<ItemSet>();
-		while(((itemSetList.size()>1)||(i == 1))){
-			System.out.println("Compute Combinations ...");
-			itemSetList = this.generateLargerItemSet(i);
-			//Lösche die Zeilen, die unter dem cutValue liegen
-			System.out.println("There are "+itemSetList.size()+" combinations");
-			int index = 0;
-			System.out.println("Compute occurency and p...");
-			int removed = 0;
-			while(index < itemSetList.size()) {
-				ItemSet s = itemSetList.get(index);
-				int occurs = this.occurs((String[])s.toArray());
-				float p = (float)occurs / (float)data.size();
-				if(p < cutValue){
-					itemSetList.remove(index);
-					removed++;
-					//System.out.println("remove: "+p);
-				}else{
-					index++;
-				}
-			}
-			
-			System.out.println("Es wurden "+removed+" Einträge entfernt");
-			System.out.println("Finisch: "+itemSetList.size());
-			System.out.println("Erstelle neue Join Tabelle");
-			//neue Join Tabelle erstellen
-			createNewTable(i,itemSetList);
-			
-			System.out.println("----------------------------------");
-			
-			i++;
-		}
-		
-		
-	}
+	
+
 	
 	
 	
