@@ -23,7 +23,7 @@ public class Reader {
 	protected void readFile(){
 		String line;
 		try {
-		    InputStream fis = new FileInputStream("data/test");
+		    InputStream fis = new FileInputStream("data/transactions.txt");
 		    InputStreamReader isr = new InputStreamReader(fis, Charset.forName("ISO-8859-1"));
 		    BufferedReader br = new BufferedReader(isr);
 		  

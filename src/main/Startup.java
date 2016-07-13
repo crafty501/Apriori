@@ -17,7 +17,7 @@ public class Startup {
 		
 		
 		Reader r1 = new Reader();
-		r1.Apriori(10, 0.25f);
+		//r1.Apriori(10, 0.25f);
 		
 		System.out.println("DB-Apriori mit cutValue=0.015f");
 		Apriori apri = new Apriori(0.015f);

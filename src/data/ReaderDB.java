@@ -221,12 +221,26 @@ public class ReaderDB {
 		return erg;
 		
 	}
+	
+	/**
+	 * Diese Methode schaut ob Array A in Array B 
+	 * enthalten ist. 
+	 * 
+	 * @param A
+	 * @param B
+	 * @return
+	 */
 	protected boolean contains2(String[] A, String[] B){
 		int c = 0;
 		for (int i = 0; i < A.length; i++) {
+			int valueA = Integer.valueOf(A[i]);
 			for (int j = 0; j < B.length; j++) {
 				if(A[i].equals(B[j])){
 					c++;
+				}
+				int valueB = Integer.valueOf(B[j]);
+				if(valueA < valueB){ 
+					j = B.length; // Beende Schleife
 				}
 			}
 		}
