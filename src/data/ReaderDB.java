@@ -1,10 +1,13 @@
 package data;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.file.ReadOnlyFileSystemException;
 import java.sql.ResultSet;
@@ -26,7 +29,7 @@ public class ReaderDB {
 
 	
 	protected final DB2ConnectionManager mgr;
-	protected List<String[]> data;
+	protected List<int[]> data;
 	protected List<ItemSet> itemSetList;
 	int itemSetCount;
 	
@@ -44,21 +47,51 @@ public class ReaderDB {
 	}
 	
 	protected void readFile(){
-		data = new ArrayList<String[]>();
+		data = new ArrayList<int[]>();
 		String line;
 		try {
-			System.out.println("Load File: "+"data/transactions.txt");
-		    InputStream fis = new FileInputStream("data/transactions.txt");
+			System.out.println("Load File: "+"data/transactionslarge.txt");
+		    InputStream fis = new FileInputStream("data/transactionslarge.txt");
 		    InputStreamReader isr = new InputStreamReader(fis, Charset.forName("ISO-8859-1"));
 		    BufferedReader br = new BufferedReader(isr);
 		  
 		    while ((line = br.readLine()) != null){
 		    	String[] zeile = line.split(" ");
-		    	data.add(zeile);
+		    	int[] intZeile = new int[zeile.length];
+		    	for(int i = 0; i < zeile.length; i++){
+		    		intZeile[i] = Integer.parseInt(zeile[i]);
+		    	}
+		    	data.add(intZeile);
 		    }
 		    
 		}catch (IOException e ){
 			System.out.println(e.getMessage());
+		 }
+	}
+
+	protected void savetoFile(int c,List<ItemSet> liste){
+		
+		try {
+	
+			File datei = new File("data/"+c+".txt");
+		    if (datei.exists()) {
+		      datei.delete();
+		    }
+			
+			
+			System.out.println("Save to File: "+c+".txt");
+		    OutputStream fis = new FileOutputStream("data/"+c+".txt");
+		  
+		    for (ItemSet itemSet : liste) {
+		    	String line = itemSet.toString() + "\n";
+				byte[] b = line.getBytes();
+				fis.write(b);
+			}
+		    
+		    fis.close();
+		}catch (IOException e ){
+			System.out.println(e.getMessage());
+			System.exit(0);
 		 }
 	}
 	
@@ -68,16 +101,16 @@ public class ReaderDB {
 	 * Itemsets der länge 1 zurückgegeben. 
 	 * @return
 	 */
-	protected List<String[]> giveItemsOnce(){
-		List<String[]> list = new ArrayList<String[]>();
-		List<String> x = new ArrayList<String>();
-		for (String[] strings : data) {
-			for (int i = 0; i < strings.length; i++) {
-				String str = strings[i];
-				if(!x.contains(str)){
-					x.add(str);
-					String[] o = new String[1];
-					o[0] = str;
+	protected List<int[]> giveItemsOnce(){
+		List<int[]> list = new ArrayList<int[]>();
+		List<Integer> x = new ArrayList<Integer>();
+		for (int[] ids : data) {
+			for (int i = 0; i < ids.length; i++) {
+				int id = ids[i];
+				if(!x.contains(id)){
+					x.add(id);
+					int[] o = new int[1];
+					o[0] = id;
 					list.add(o);
 				}
 			}
@@ -90,20 +123,20 @@ public class ReaderDB {
 	 * Itemsets der länge 1 zurückgegeben. 
 	 * @return
 	 */
-	protected List<String[]> giveItemsOnce(List<ItemSet> itemSetList){
-		List<String[]> list = new ArrayList<String[]>();
-		List<String> x = new ArrayList<String>();
+	protected List<int[]> giveItemsOnce(List<ItemSet> itemSetList){
+		List<int[]> list = new ArrayList<int[]>();
+		List<Integer> x = new ArrayList<Integer>();
 		Iterator<ItemSet> it = itemSetList.iterator();
 		
 		while(it.hasNext()){
 			ItemSet s = it.next();
-			String[] values = (String[])s.toArray();
+			int[] values = s.toArray();
 			for (int i = 0; i < values.length; i++) {
-				String str = values[i];
-				if(!x.contains(str)){
-					x.add(str);
-					String[] o = new String[1];
-					o[0] = str;
+				int id = values[i];
+				if(!x.contains(id)){
+					x.add(id);
+					int[] o = new int[1];
+					o[0] = id;
 					list.add(o);
 				}
 			}
@@ -114,13 +147,13 @@ public class ReaderDB {
 	
 	protected void createNewTable(int c ,List<ItemSet> itemSetList){
 		try {
-			List<String[]> l = this.giveItemsOnce(itemSetList);
+			List<int[]> l = this.giveItemsOnce(itemSetList);
 			String Anfrage = "CREATE TABLE VSISP72.ITEMSET"+c+" ( "
 							+ "ITEM varchar(255) PRIMARY KEY NOT NULL)";
 			//System.out.println(Anfrage);
 			mgr.sendQuery(Anfrage, false);
-		for (String[] strings : l) {
-			String value = strings[0];
+		for (int[] ids : l) {
+			int value = ids[0];
 			Anfrage = "INSERT INTO ItemSet"+c+" "
 						+ "(ITEM)"
 						+ "VALUES"
@@ -138,13 +171,13 @@ public class ReaderDB {
 	protected void createFirstJoinTable(){
 		try {
 			//TODO: Hier die itemSetList übergeben
-			List<String[]> l = this.giveItemsOnce();
+			List<int[]> l = this.giveItemsOnce();
 			String Anfrage = "CREATE TABLE VSISP72.ITEMSET0 ( "
 							+ "ITEM varchar(255) PRIMARY KEY NOT NULL)";
 			//System.out.println(Anfrage);
 			mgr.sendQuery(Anfrage, false);
-		for (String[] strings : l) {
-			String value = strings[0];
+		for (int[] ids : l) {
+			String value = String.valueOf(ids[0]);
 			Anfrage = "INSERT INTO ItemSet0 "
 						+ "(ITEM)"
 						+ "VALUES"
@@ -179,6 +212,7 @@ public class ReaderDB {
 		}else{
 		 Anfrage = "SELECT "+field_names+" FROM "+ table_names;
 		}
+		//System.out.println(Anfrage);
 		return Anfrage;
 	}
 	
@@ -199,12 +233,16 @@ public class ReaderDB {
 		while(res.next()){
 			ItemSet itemSet = new ItemSet();
 			for (int i = 1; i <= c; i++) {
-				itemSet.add(res.getString(i));
+					itemSet.add(res.getInt(i));
 			}
+			if(itemSet.size() == c){
 			//Doppelte Einträger werden vermieden, 
 			//weil items ein HashSet ist
 			items.add(itemSet);
+		
+			}
 		}
+			
 		
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -230,17 +268,12 @@ public class ReaderDB {
 	 * @param B
 	 * @return
 	 */
-	protected boolean contains2(String[] A, String[] B){
+	protected boolean contains2(int[] A, int[] B){
 		int c = 0;
 		for (int i = 0; i < A.length; i++) {
-			int valueA = Integer.valueOf(A[i]);
 			for (int j = 0; j < B.length; j++) {
-				if(A[i].equals(B[j])){
+				if(A[i]==B[j]){
 					c++;
-				}
-				int valueB = Integer.valueOf(B[j]);
-				if(valueA < valueB){ 
-					j = B.length; // Beende Schleife
 				}
 			}
 		}
@@ -251,11 +284,11 @@ public class ReaderDB {
 		}
 		
 	}
-	protected int occurs(String[] line){
+	protected int occurs(int[] line){
 		
 		int c = 0;
-		for (String[] strings : data) {
-			if(this.contains2(line, strings)){
+		for (int[] ids : data) {
+			if(this.contains2(line, ids)){
 				c++;
 			}
 		}

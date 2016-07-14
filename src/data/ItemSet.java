@@ -10,25 +10,28 @@ public class ItemSet {
 	
 	public ItemSet(){
 		super();
-		items = new HashSet<String>();
+		items = new HashSet<Integer>();
 	}
 	
-	public boolean add(String item){
+	public boolean add(int item){
 		return items.add(item);
 	}
 	
+	public int size(){
+		return items.size();
+	}
 
-	public Object[] toArray(){
+	public int[] toArray(){
 		
 		int size = items.size();
 		
-		String[] erg = new String[size];
+		int[] erg = new int[size];
 		int i = 0;
-		Iterator<String> I = items.iterator();
+		Iterator<Integer> I = items.iterator();
 		while(I.hasNext()){
-			String S = I.next();
+			int id = I.next();
 			//System.out.println(S);
-			erg[i] = S;
+			erg[i] = id;
 			i++;
 		}
 		return erg;
@@ -47,17 +50,17 @@ public class ItemSet {
 	public int hashCode(){
 		
 		int sum = 0;
-		Iterator<String> I = items.iterator();
+		Iterator<Integer> I = items.iterator();
 		while (I.hasNext()) {
-			String S = I.next();
-			sum = sum + S.hashCode();
+			int id = I.next();
+			sum = sum + id;
 		}
 		return sum;
 	}
 	
 	public String toString(){
 		
-		Iterator<String> I = items.iterator();
+		Iterator<Integer> I = items.iterator();
 		String erg = "{";
 		while (I.hasNext()) {
 			if(erg.equals("{")){

@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-public class Reader {
+public class AprioriNaive {
 
 	protected List<String[]> data;
 	
@@ -65,6 +65,7 @@ public class Reader {
 				if(A[i].equals(B[j])){
 					c++;
 				}
+				
 			}
 		}
 		if(c == A.length){
@@ -151,7 +152,7 @@ public class Reader {
 				String[] obj 	= liste.get(i);
 								
 				for (String lastElement : one) {
-					//Erstelle ein neues Array und die letzte stelle 
+					//Erstelle ein neues Array und die letzte Stelle 
 					//wird jedes Element angehangen
 					String[] neu = new String[obj.length + 1];
 					for (int j = 0; j < neu.length -1; j++) {
@@ -191,7 +192,7 @@ public class Reader {
 	
 	
 	
-	public Reader(){	
+	public AprioriNaive(){	
 		data = new ArrayList<String[]>();
 		//data = new LinkedList<String[]>();
 	
